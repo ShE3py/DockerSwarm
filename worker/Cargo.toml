@@ -14,3 +14,9 @@ publish = false
 all-features = true
 targets = []
 rustdoc-args = ["--cfg", "nightlydoc"]
+
+[dependencies.hex]
+version = "0.4.3"
+
+[dependencies.md5]
+version = "0.7.0"
