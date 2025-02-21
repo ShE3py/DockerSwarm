@@ -1,0 +1,30 @@
+name: Worker
+
+on:
+  push:
+    branches:
+      - master
+  
+  pull_request:
+    branches:
+      - master
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./worker
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build
+        run: cargo build
+        
+      - name: Test
+        run: cargo test
