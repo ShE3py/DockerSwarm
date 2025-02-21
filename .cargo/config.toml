@@ -2,7 +2,7 @@
 rustflags = [
 	# Written for rustc 1.83.0 (90b35a623 2024-11-26)
 	# Allowed-by-default
-	"-Felided_lifetimes_in_paths", "-Wexplicit_outlives_requirements", "-Fffi_unwind_calls", "-Flet_underscore_drop",
+	"-Felided_lifetimes_in_paths", "-Wexplicit_outlives_requirements", "-Fffi_unwind_calls",
 	"-Wmeta_variable_misuse", "-Fmissing_abi", "-Wmissing_debug_implementations", "-Fnon_ascii_idents", "-Wredundant_lifetimes",
 	"-Wsingle_use_lifetimes", "-Funnameable_types", "-Wunreachable_pub", "-Wunsafe_op_in_unsafe_fn", "-Wunused_extern_crates",
 	"-Wunused_import_braces", "-Wunused_lifetimes", "-Wunused_qualifications",
@@ -34,7 +34,7 @@ rustflags = [
 	"-Wclippy::large_stack_arrays", "-Wclippy::large_types_passed_by_value", "-Wclippy::macro_use_imports", "-Wclippy::manual_assert",
 	"-Wclippy::manual_instant_elapsed", "-Wclippy::manual_is_variant_and", "-Wclippy::manual_let_else",
 	"-Wclippy::manual_ok_or", "-Fclippy::manual_string_new", "-Wclippy::map_unwrap_or", "-Wclippy::match_bool", "-Wclippy::match_on_vec_items",
-	"-Wclippy::match_same_arms", "-Fclippy::match_wild_err_arm", "-Wclippy::match_wildcard_for_single_variants",
+	"-Fclippy::match_wild_err_arm", "-Wclippy::match_wildcard_for_single_variants",
 	"-Wclippy::mismatching_type_param_order", "-Wclippy::module_name_repetitions", "-Wclippy::must_use_candidate", "-Wclippy::mut_mut",
 	"-Wclippy::naive_bytecount", "-Wclippy::needless_bitwise_bool", "-Wclippy::needless_continue", "-Wclippy::needless_for_each",
 	"-Wclippy::needless_pass_by_value", "-Fclippy::no_mangle_with_rust_abi", "-Fclippy::option_as_ref_cloned", "-Fclippy::option_option",
