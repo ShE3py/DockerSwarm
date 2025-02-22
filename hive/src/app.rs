@@ -1,7 +1,6 @@
-use eframe::egui::{FontFamily, TextStyle};
 use eframe::wasm_bindgen::closure::Closure;
 use eframe::{egui, App, CreationContext, Frame};
-use egui::{CentralPanel, Context, TextEdit, TopBottomPanel};
+use egui::{CentralPanel, Context, TextEdit, TextStyle, TopBottomPanel};
 use egui_form::garde::GardeReport;
 use egui_form::{garde::field_path, Form, FormField};
 use garde::Validate;
@@ -13,7 +12,7 @@ use web_sys::wasm_bindgen::JsCast as _;
 use web_sys::{MessageEvent, WebSocket};
 
 #[derive(Debug, Validate)]
-pub struct Hive {
+pub(crate) struct Hive {
     /// The md5's field value.
     #[garde(custom(validate_md5))]
     md5: String,
