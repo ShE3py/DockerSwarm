@@ -28,3 +28,7 @@ features = ["validator_garde"]
 [dependencies.garde]
 version = "0.22.0"
 features = ["derive"]
+
+[dependencies.web-sys]
+version = "0.3.77"
+features = ["WebSocket", "MessageEvent"]
