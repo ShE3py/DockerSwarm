@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "hive",
+    "worker",
+]
+resolver = "2"
+
+[workspace.package]
+authors = ["Lieselotte"]
+repository = "https://github.com/ShE3py/DockerSwarm/"
+license = "AGPL-3.0-or-later"
+edition = "2021"
+rust-version = "1.74"
+publish = false
+
+[workspace.dependencies]
+hex = "0.4.3"
+log = "0.4.26"
+md5 = "0.7.0"
+tungstenite = "0.26.2"
