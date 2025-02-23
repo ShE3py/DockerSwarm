@@ -1,4 +1,4 @@
-use eframe::egui::{Context, FontFamily, Key, RichText, TextEdit, TextStyle, Ui};
+use eframe::egui::{Context, FontFamily, Key, RichText, TextEdit, TextStyle, Ui, Widget};
 use eframe::wasm_bindgen::closure::Closure;
 use egui_form::garde::{field_path, GardeReport};
 use egui_form::{Form, FormField};
@@ -53,12 +53,14 @@ pub(crate) struct Manual {
     result: RefCell<String>,
 }
 
+const MAX_LEN: usize = 5;
+
 fn validate_word(word: &RefCell<String>, _cx: &()) -> garde::Result {
     let lock = word.borrow();
     let s = (*lock).as_str().trim();
     
-    if s.len() > 5 {
-        Err(garde::Error::new("Le mot doit faire au plus 5 caractères"))
+    if s.len() > MAX_LEN {
+        Err(garde::Error::new(format!("Le mot doit faire au plus {MAX_LEN} caractères")))
     }
     else if s.chars().any(|c| !c.is_ascii_alphanumeric()) {
         Err(garde::Error::new("Le mot doit être alphanumérique"))
@@ -66,6 +68,26 @@ fn validate_word(word: &RefCell<String>, _cx: &()) -> garde::Result {
     else {
         Ok(())
     }
+}
+
+/// Alphabet des mots acceptés (dans l'ordre ASCII).
+const ALPHABET: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+/// Renvoie la complexité d'un nombre entre 0 et 10.
+fn word_complexity(word: &str) -> f32 {
+    type U = u32;
+    assert!((ALPHABET.len() * (MAX_LEN + 1)) - 1 <= U::MAX as usize);
+    
+    // `word` in base `ALPHABET.len()`
+    let c: U = word.chars().enumerate()
+        .map(
+            |(i, c)| ALPHABET.iter().copied()
+                .position(|s| s as char == c)
+                .map_or(0, |p| ((p + 1) as U).saturating_mul((ALPHABET.len() as U).saturating_pow(i as u32)))
+        )
+        .fold(0, |acc, x| acc.saturating_add(x));
+    
+    (c as f32).log2() * (10.0 / U::BITS as f32)
 }
 
 fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
@@ -149,7 +171,6 @@ impl Manual {
                             let this = Rc::clone(self);
                             let ctx = ctx.clone();
                             let on_interval = Closure::<dyn FnMut()>::new(move || {
-                                const ALPHABET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
                                 let word = String::from_utf8(fastrand::choose_multiple(ALPHABET.iter().copied(), 4)).expect("bad generated word?");
                                 
                                 this.word.replace(word);
@@ -175,16 +196,24 @@ impl Manual {
             // Word field
             let res = FormField::new(&mut form, field_path!("word"))
                 .label("Mot")
-                .ui(ui, TextEdit::singleline(self.word.borrow_mut().deref_mut()).font(TextStyle::Monospace));
+                .ui(ui, |ui: &mut Ui| ui.horizontal(|ui| {
+                    let res = TextEdit::singleline(self.word.borrow_mut().deref_mut()).font(TextStyle::Monospace).ui(ui);
+                    
+                    // Word complexity
+                    if res.has_focus() || res.hovered() {
+                        ui.label(format!("Difficulté : {:.1}", word_complexity(self.word.borrow().as_str())));
+                    }
+                    
+                    res
+                }).inner);
             if res.changed() { self.update_md5() };
-            let mut submit = res.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
+            let mut submitted = res.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
             
             // MD5 field
             let res = FormField::new(&mut form, field_path!("md5"))
                 .label("MD5")
                 .ui(ui, TextEdit::singleline(self.md5.borrow_mut().deref_mut()).font(TextStyle::Monospace));
-            submit |= res.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
-            
+            submitted |= res.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
             
             // Result
             ui.vertical(|ui| {
@@ -199,24 +228,24 @@ impl Manual {
                     .family(FontFamily::Monospace);
                 ui.label(result);
                 
-                // Update/spinner
-                submit |= ui.horizontal(|ui| if is_manual && in_progress < 2 {
-                    let res = ui.button("Obtenir").clicked();
-                    if in_progress > 0 {
+                // Spinners
+                ui.horizontal(|ui| {
+                    if is_manual && in_progress < 2 {
+                        // The button is always shown so as to avoid flicker.
+                        submitted |= ui.button("Obtenir").clicked();
+                        if in_progress > 0 {
+                            ui.spinner();
+                        }
+                    }
+                    else {
+                        ui.label(format!("En attente : {in_progress}"));
                         ui.spinner();
                     }
-                    res
-                }
-                else {
-                    ui.label(format!("En attente : {in_progress}"));
-                    ui.spinner();
-                    false
-                }).inner;
+                });
             });
             
-            
             // Submit action
-            if submit && form.try_submit(ui).is_ok() {
+            if submitted && form.try_submit(ui).is_ok() {
                 self.ws_send();
             }
         });
