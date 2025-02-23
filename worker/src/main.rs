@@ -2,6 +2,7 @@ use std::io::ErrorKind;
 use std::net::{SocketAddr, TcpListener};
 use std::process::exit;
 use std::str::FromStr as _;
+use std::thread;
 use tungstenite::protocol::frame::coding::CloseCode;
 use tungstenite::protocol::CloseFrame;
 use tungstenite::{Message, WebSocket};
@@ -87,5 +88,8 @@ fn main() {
 
         // Remove closed connections.
         clients.retain(WebSocket::can_write);
+        
+        // Gives up the timeslice.
+        thread::yield_now();
     }
 }
