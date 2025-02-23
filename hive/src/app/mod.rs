@@ -23,17 +23,17 @@ impl Hive {
 }
 
 impl App for Hive {
-    fn update(&mut self, rcx: &Context, _frame: &mut Frame) {
+    fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
         // Put your widgets into a `SidePanel`, `TopBottomPanel`, `CentralPanel`, `Window` or `Area`.
         
-        TopBottomPanel::top("top_panel").show(rcx, |ui| {
+        TopBottomPanel::top("top_panel").show(ctx, |ui| {
             egui::menu::bar(ui, |ui| {
                 egui::widgets::global_theme_preference_buttons(ui);
             });
         });
         
-        CentralPanel::default().show(rcx, |ui| {
-            self.manual.ui(rcx, ui);
+        CentralPanel::default().show(ctx, |ui| {
+            self.manual.ui(ctx, ui);
         });
     }
 }

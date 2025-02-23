@@ -33,3 +33,7 @@ features = ["derive"]
 [dependencies.web-sys]
 version = "0.3.77"
 features = ["WebSocket", "MessageEvent"]
+
+# this one is already included as a transitive dep, so reuse it for rng
+[dependencies.fastrand]
+version = "2.3.0"
