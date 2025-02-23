@@ -1260,6 +1260,7 @@ dependencies = [
  "garde",
  "hex",
  "log",
+ "md5",
  "wasm-bindgen-futures",
  "web-sys",
 ]

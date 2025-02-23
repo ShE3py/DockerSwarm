@@ -11,6 +11,7 @@ publish.workspace = true
 [dependencies]
 hex.workspace = true
 log.workspace = true
+md5.workspace = true
 
 [dependencies.eframe]
 version = "0.31.0"
