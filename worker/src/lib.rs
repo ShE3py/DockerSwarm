@@ -3,7 +3,7 @@ use md5::Digest;
 use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 
-const MAX_LEN: usize = 4;
+const MAX_LEN: usize = 5;
 
 /// Tente de retrouver un texte alphanumérique (`A-Za-z0-9`) correspondant à un condensat MD5.
 ///
@@ -23,7 +23,7 @@ pub fn md5break(md5: &str) -> Result<String, BreakError> {
     hex::decode_to_slice(md5, &mut digest.0)?;
 
     // List all possible words.
-    let mut buf = Vec::new();
+    let mut buf = Vec::with_capacity(MAX_LEN);
     loop {
         // Increase the leftmost character
         for c in &mut buf {

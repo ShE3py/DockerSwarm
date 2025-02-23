@@ -1,9 +1,8 @@
-use eframe::egui::{Context, TextEdit, TextStyle, Ui};
+use eframe::egui::{Context, FontFamily, Key, RichText, TextEdit, TextStyle, Ui};
 use eframe::wasm_bindgen::closure::Closure;
 use egui_form::garde::{field_path, GardeReport};
 use egui_form::{Form, FormField};
 use garde::Validate;
-use hex::FromHexError;
 use std::cell::{Cell, OnceCell, RefCell};
 use std::ops::{Deref as _, DerefMut as _};
 use std::rc::Rc;
@@ -13,6 +12,10 @@ use web_sys::{MessageEvent, WebSocket};
 /// User-specified manual MD5 break.
 #[derive(Debug, Validate)]
 pub(crate) struct Manual {
+    /// The word to break (autofill `md5` field)
+    #[garde(custom(validate_word))]
+    word: RefCell<String>,
+    
     /// The md5's field value.
     #[garde(custom(validate_md5))]
     md5: RefCell<String>,
@@ -30,12 +33,34 @@ pub(crate) struct Manual {
     broken: RefCell<Option<String>>,
 }
 
+fn validate_word(word: &RefCell<String>, _cx: &()) -> garde::Result {
+    let lock = word.borrow();
+    let s = (*lock).as_str().trim();
+    
+    if s.len() > 5 {
+        Err(garde::Error::new("Le mot doit faire au plus 5 caractères"))
+    }
+    else if s.chars().any(|c| !c.is_ascii_alphanumeric()) {
+        Err(garde::Error::new("Le mot doit être alphanumérique"))
+    }
+    else {
+        Ok(())
+    }
+}
+
 fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
-    let mut digest = [0; 16];
-    hex::decode_to_slice(md5.borrow().deref(), &mut digest).map_err(|e| garde::Error::new(match e {
-        FromHexError::InvalidHexCharacter { c, index: _ } => format!("{c:?} n'est pas un chiffre valide"),
-        FromHexError::OddLength | FromHexError::InvalidStringLength => "Le MD5 doit faire 32 caractères".to_owned(),
-    }))
+    let lock = md5.borrow();
+    let s = (*lock).as_str().trim();
+    
+    if s.chars().any(|c| !c.is_ascii_hexdigit()) {
+        Err(garde::Error::new("Le MD5 doit être hexadécimal"))
+    }
+    else if s.len() != 32 {
+        Err(garde::Error::new("Le MD5 doit faire 32 caractères"))
+    }
+    else {
+        Ok(())
+    }
 }
 
 impl Manual {
@@ -66,24 +91,65 @@ impl Manual {
     pub(crate) fn ui(&self, _rcx: &Context, ui: &mut Ui) {
         ui.heading("Hive");
         
-        ui.label("Exemples : f71dbe52628a3f83a77ab494817525c6 / 5d933eef19aee7da192608de61b6c23d / 49d02d55ad10973b7b9d0dc9eba7fdf0");
+        if self.socks.get().is_none() {
+            ui.horizontal(|ui| {
+                ui.label("Connexion…");
+                ui.spinner();
+            });
+            
+            return;
+        }
         
-        ui.add_enabled_ui(!self.in_progress.get() && self.socks.get().is_some(), |ui| {
+        // Form
+        ui.add_enabled_ui(!self.in_progress.get(), move |ui| {
             let mut form = Form::new().add_report(GardeReport::new(self.validate()));
             
-            FormField::new(&mut form, field_path!("md5"))
+            // Word field
+            let res = FormField::new(&mut form, field_path!("word"))
+                .label("Mot")
+                .ui(ui, TextEdit::singleline(self.word.borrow_mut().deref_mut()).font(TextStyle::Monospace));
+            if res.changed() {
+                self.md5.replace(hex::encode(md5::compute(self.word.borrow().deref()).0));
+            }
+            let mut submit = res.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
+            
+            // MD5 field
+            let res = FormField::new(&mut form, field_path!("md5"))
                 .label("MD5")
                 .ui(ui, TextEdit::singleline(self.md5.borrow_mut().deref_mut()).font(TextStyle::Monospace));
+            submit |= res.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter));
             
-            let res = ui.horizontal(|ui| {
-                let res = ui.button("Retrouver");
-                if self.in_progress.get() {
-                    ui.spinner();
+            
+            // Result
+            ui.vertical(|ui| {
+                // Label
+                let label = RichText::new("Résultat")
+                    .size(ui.style().text_styles.get(&TextStyle::Body).map_or(16.0, |s| s.size) * 0.9);
+                ui.label(label);
+                
+                // Value, if available
+                if let Ok(lock) = self.broken.try_borrow() {
+                    if let Some(s) = lock.as_ref() {
+                        let value = RichText::new(s.as_str())
+                            .color(ui.visuals().override_text_color.unwrap_or(ui.visuals().widgets.inactive.text_color()))
+                            .family(FontFamily::Monospace);
+                        ui.label(value);
+                    }
                 }
-                res
-            }).inner;
+                
+                // Update/spinner
+                submit |= ui.horizontal(|ui| {
+                    let res = ui.button("Obtenir");
+                    if self.in_progress.get() {
+                        ui.spinner();
+                    }
+                    res.clicked()
+                }).inner;
+            });
             
-            if let Some(Ok(())) = form.handle_submit(&res, ui) {
+            
+            // Submit action
+            if submit && form.try_submit(ui).is_ok() {
                 self.in_progress.set(true);
                 info!("MD5: {:?}", self.md5);
                 
@@ -93,18 +159,13 @@ impl Manual {
                 }
             }
         });
-        
-        if let Ok(lock) = self.broken.try_borrow() {
-            if let Some(s) = lock.as_ref() {
-                ui.label(s.as_str());
-            }
-        }
     }
 }
 
 impl Default for Manual {
     fn default() -> Self {
         Manual {
+            word: RefCell::new("1234".to_owned()),
             md5: RefCell::new("81dc9bdb52d04dc20036dbd8313ed055".to_owned()),
             in_progress: Cell::new(false),
             socks: OnceCell::new(),
