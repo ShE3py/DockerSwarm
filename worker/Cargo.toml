@@ -11,6 +11,7 @@ rust-version.workspace = true
 publish.workspace = true
 
 [dependencies]
+ctrlc = "3.4.5"
 hex.workspace = true
 md5.workspace = true
 tungstenite.workspace = true

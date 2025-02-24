@@ -8,6 +8,11 @@ edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
 
+[profile.release]
+opt-level = "z"
+debug = "full"
+lto = "fat"
+
 [dependencies]
 hex.workspace = true
 log.workspace = true
