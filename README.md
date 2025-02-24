@@ -1,6 +1,17 @@
+Lancement :
+```
+# modprobe br_netfilter
+# docker swarm init --advertise-addr lo
+# docker compose build
+# docker stack deploy -c docker-compose.yaml 64
+```
+
+Puis le site web sera disponible à l’adresse suivante :  
+<http://localhost:8080/>
+
 ## License
 
-Copyright (C) 2024 Lieselotte <52315535+she3py@users.noreply.github.com>
+Copyright (C) 2024, 2025 Lieselotte <52315535+she3py@users.noreply.github.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by

@@ -1,5 +1,6 @@
 services:
   worker:
+    image: worker
     build:
       target: worker
     
@@ -7,6 +8,7 @@ services:
       - '3000:3000'
   
   hive:
+    image: hive
     build:
       target: hive
     
