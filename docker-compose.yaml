@@ -1,0 +1,14 @@
+services:
+  worker:
+    build:
+      target: worker
+    
+    ports:
+      - '3000:3000'
+  
+  hive:
+    build:
+      target: hive
+    
+    ports:
+      - '8080:80'

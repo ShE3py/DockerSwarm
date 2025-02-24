@@ -24,7 +24,7 @@ fn main() {
             .expect("No document");
         
         // Connexion au websocket
-        let thighs = WebSocket::new("ws://localhost:8000").unwrap();
+        let thighs = WebSocket::new("ws://localhost:3000").unwrap();
         
         let canvas = document
             .get_element_by_id("the_canvas_id")

@@ -1,5 +1,5 @@
 use std::io::ErrorKind;
-use std::net::{SocketAddr, TcpListener};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener};
 use std::process::exit;
 use std::str::FromStr as _;
 use std::thread;
@@ -8,8 +8,11 @@ use tungstenite::protocol::CloseFrame;
 use tungstenite::{Message, WebSocket};
 
 fn main() {
-    let addr = SocketAddr::from_str("127.0.0.1:8000").unwrap();
-
+    ::ctrlc::set_handler(|| {
+        exit(130);
+    }).unwrap();
+    
+    let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), 3000);
     let server = match TcpListener::bind(addr) {
         Ok(s) => s,
         Err(e) => {
@@ -25,7 +28,7 @@ fn main() {
 
     let mut clients = Vec::new();
 
-    println!("Server started on {addr}");
+    println!("Server started on ws://{}", server.local_addr().unwrap_or(addr));
     loop {
         // Accept incoming connections.
         match server.accept() {
