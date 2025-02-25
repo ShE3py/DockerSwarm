@@ -4,6 +4,7 @@ Lancement :
 # docker swarm init --advertise-addr lo
 # docker compose build
 # docker stack deploy -c docker-compose.yaml 64
+# docker stack ps 64
 ```
 
 Puis le site web sera disponible à l’adresse suivante :  
