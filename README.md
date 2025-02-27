@@ -1,3 +1,6 @@
+# DockerSwarm
+[![CI](https://github.com/ShE3py/DockerSwarm/actions/workflows/docker.yaml/badge.svg?event=push)](https://github.com/ShE3py/DockerSwarm/actions/workflows/docker.yaml)
+
 Lancement :
 ```
 # modprobe br_netfilter
@@ -9,6 +12,11 @@ Lancement :
 
 Puis le site web sera disponible à l’adresse suivante :  
 <http://localhost:8080/>
+
+## Crates
+
+- `hive`: le front-end.
+- `worker`: le back-end (lib pour casser des MD5, et bin pour l'exposer via un WebSocket).
 
 ## License
 
