@@ -1,15 +1,6 @@
 name: Worker
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - worker/**
-      - Cargo.lock
-      - Cargo.toml
-      - .github/workflows/worker.yaml
-  
   pull_request:
     branches:
       - master
