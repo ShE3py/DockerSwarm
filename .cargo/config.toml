@@ -64,5 +64,8 @@ rustflags = [
 
 	# Cargo
 	# "-Wclippy::multiple_crate_versions", FIXME: make PR to update zerocopy to 0.8
-    "-Fclippy::negative_feature_names", "-Fclippy::redundant_feature_names", "-Fclippy::wildcard_dependencies"
+    "-Fclippy::negative_feature_names", "-Fclippy::redundant_feature_names", "-Fclippy::wildcard_dependencies",
+    
+    # Rustdoc
+    "-Wrustdoc::private_doc_tests", "-Wrustdoc::unescaped_backticks"
 ]
