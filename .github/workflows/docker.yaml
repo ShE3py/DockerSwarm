@@ -12,7 +12,7 @@ on:
     paths:
       - docker-compose.yaml
       - Dockerfile
-      - .github/workflows/compose.yaml
+      - .github/workflows/docker.yaml
 
 jobs:
   build:
