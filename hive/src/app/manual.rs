@@ -1,4 +1,5 @@
-use eframe::egui::{Context, FontFamily, Key, RichText, TextEdit, TextStyle, Ui, Widget};
+use std::any::type_name;
+use eframe::egui::{Context, FontFamily, Key, RichText, TextEdit, TextStyle, Ui, Widget as _};
 use eframe::wasm_bindgen::closure::Closure;
 use egui_form::garde::{field_path, GardeReport};
 use egui_form::{Form, FormField};
@@ -76,16 +77,17 @@ const ALPHABET: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRTUVWXYZabcdefghijklmnopqrs
 /// Renvoie la complexité d'un nombre entre 0 et 10.
 fn word_complexity(word: &str) -> f32 {
     type U = u32;
-    assert!((ALPHABET.len() * (MAX_LEN + 1)) - 1 <= U::MAX as usize);
+    assert!((ALPHABET.len() * (MAX_LEN + 1)) - 1 <= U::MAX as usize, "`{}` is too small for the alphabet", type_name::<U>());
     
     // `word` in base `ALPHABET.len()`
+    #[expect(clippy::cast_possible_truncation, reason = "usize as U")]
     let c: U = word.chars().enumerate()
         .map(
             |(i, c)| ALPHABET.iter().copied()
                 .position(|s| s as char == c)
-                .map_or(0, |p| ((p + 1) as U).saturating_mul((ALPHABET.len() as U).saturating_pow(i as u32)))
+                .map_or(0, |p| ((p + 1) as U).saturating_mul((ALPHABET.len() as U).saturating_pow(i as U)))
         )
-        .fold(0, |acc, x| acc.saturating_add(x));
+        .fold(0, U::saturating_add);
     
     (c as f32).log2() * (10.0 / U::BITS as f32)
 }
@@ -106,11 +108,11 @@ fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
 }
 
 impl Manual {
-    pub(crate) fn new(thighs: WebSocket) -> Rc<Manual> {
+    pub(crate) fn new(thighs: &WebSocket) -> Rc<Manual> {
         let this = Rc::new(Manual::default());
         
         // on open
-        let that = this.clone();
+        let that = Rc::clone(&this);
         let ws = thighs.clone();
         let on_open = Closure::<dyn FnMut()>::new(move || {
             that.socks.set(ws.clone()).unwrap();
@@ -119,7 +121,7 @@ impl Manual {
         on_open.forget();
         
         // on message
-        let that = this.clone();
+        let that = Rc::clone(&this);
         let on_message = Closure::<dyn FnMut(_)>::new(move |e: MessageEvent| {
             that.result.replace(e.data().as_string().expect("got a non-string msg"));
             that.in_progress.fetch_sub(1, Ordering::SeqCst);

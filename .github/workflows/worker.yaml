@@ -8,7 +8,9 @@ on:
       - worker/**
       - Cargo.lock
       - Cargo.toml
+      - clippy.toml
       - .github/workflows/worker.yaml
+      - .cargo/config.toml
 
 env:
   CARGO_TERM_COLOR: always
@@ -23,6 +25,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Check
+        run: cargo clippy -- -D warnings
       
       - name: Build
         run: cargo build

@@ -12,7 +12,7 @@ use crate::app::Hive;
 mod app;
 
 fn main() {
-    WebLogger::init(LevelFilter::Debug).ok();
+    _ = WebLogger::init(LevelFilter::Debug);
     info!("Démarrage de l'application...");
     
     let web_options = WebOptions::default();
@@ -37,16 +37,17 @@ fn main() {
             .start(
                 canvas,
                 web_options,
-                Box::new(|rcx| Ok(Box::new(Hive::new(rcx, thighs)))),
+                Box::new(move |rcx| Ok(Box::new(Hive::new(rcx, &thighs)))),
+                // TODO ^ add suggestion for `move`
             )
             .await;
         
         // Remove the loading text and spinner
         if let Some(loading_text) = document.get_element_by_id("loading_text") {
             match start_result {
-                Ok(_) => {
+                Ok(()) => {
                     loading_text.remove();
-                    info!("Application démarrée.")
+                    info!("Application démarrée.");
                 }
                 Err(e) => {
                     loading_text.set_inner_html(
