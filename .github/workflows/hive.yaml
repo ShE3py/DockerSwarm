@@ -8,7 +8,9 @@ on:
       - hive/**
       - Cargo.lock
       - Cargo.toml
+      - clippy.toml
       - .github/workflows/hive.yaml
+      - .cargo/config.toml
 
 env:
   CARGO_TERM_COLOR: always
@@ -26,6 +28,9 @@ jobs:
       
       - name: Install Wasm target
         run: rustup target add wasm32-unknown-unknown
+        
+      - name: Check
+        run: cargo clippy --target wasm32-unknown-unknown -- -D warnings
       
       - name: Build
         run: cargo build --target wasm32-unknown-unknown

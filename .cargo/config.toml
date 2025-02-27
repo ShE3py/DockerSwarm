@@ -14,7 +14,7 @@ rustflags = [
 	"-Dclippy::filetype_is_file", "-Wclippy::float_cmp_const", "-Dclippy::fn_to_numeric_cast_any", "-Wclippy::format_push_string",
 	"-Wclippy::get_unwrap", "-Wclippy::if_then_some_else_none", "-Wclippy::large_include_file", "-Wclippy::let_underscore_must_use",
 	"-Wclippy::map_err_ignore", "-Wclippy::missing_assert_message", "-Wclippy::missing_asserts_for_indexing",
-	"-Fclippy::mixed_read_write_in_expression", "-Fclippy::mod_module_files", "-Wclippy::mutex_atomic", "-Fclippy::pub_without_shorthand",
+	"-Fclippy::mixed_read_write_in_expression", "-Fclippy::self_named_module_files", "-Wclippy::mutex_atomic", "-Fclippy::pub_without_shorthand",
 	"-Wclippy::rc_buffer", "-Wclippy::rc_mutex", "-Fclippy::redundant_type_annotations", "-Wclippy::rest_pat_in_fully_bound_structs",
 	"-Fclippy::semicolon_outside_block", "-Fclippy::str_to_string", "-Fclippy::string_add", "-Wclippy::string_lit_chars_any",
 	"-Fclippy::string_to_string", "-Fclippy::try_err", "-Fclippy::undocumented_unsafe_blocks", "-Wclippy::unnecessary_safety_comment",
@@ -43,7 +43,7 @@ rustflags = [
 	"-Wclippy::ref_binding_to_reference", "-Wclippy::ref_option_ref", "-Wclippy::same_functions_in_if_condition",
 	"-Fclippy::semicolon_if_nothing_returned", "-Fclippy::should_panic_without_expect", "-Wclippy::similar_names",
 	"-Wclippy::stable_sort_primitive", "-Wclippy::string_add_assign", "-Wclippy::struct_field_names", "-Wclippy::str_split_at_newline",
-	"-Fclippy::transmute_ptr_to_ptr", "-Wclippy::trivially_copy_pass_by_ref", "-Fclippy::unicode_not_nfc", "-Wclippy::uninlined_format_args",
+	"-Fclippy::transmute_ptr_to_ptr", "-Fclippy::unicode_not_nfc", "-Wclippy::uninlined_format_args",
 	"-Wclippy::unnecessary_box_returns", "-Wclippy::unnecessary_join", "-Wclippy::unnecessary_wraps", "-Wclippy::unnested_or_patterns",
 	"-Fclippy::unsafe_derive_deserialize", "-Wclippy::zero_sized_map_values", "-Wclippy::assigning_clones", "-Wclippy::single_char_pattern",
 	"-Wclippy::manual_is_power_of_two", "-Wclippy::used_underscore_items", "-Wclippy::ref_option",
@@ -55,7 +55,7 @@ rustflags = [
 	"-Wclippy::imprecise_flops", "-Wclippy::iter_on_empty_collections", "-Wclippy::iter_on_single_items", "-Wclippy::iter_with_drain",
 	"-Wclippy::large_stack_frames", "-Wclippy::manual_clamp", "-Wclippy::missing_const_for_fn", "-Wclippy::mutex_integer",
 	"-Wclippy::needless_collect", "-Wclippy::needless_pass_by_ref_mut", "-Fclippy::non_send_fields_in_send_ty", "-Wclippy::nonstandard_macro_braces",
-	"-Wclippy::option_if_let_else", "-Wclippy::or_fun_call", "-Wclippy::path_buf_push_overwrite", "-Wclippy::read_zero_byte_vec",
+	"-Wclippy::option_if_let_else", "-Wclippy::path_buf_push_overwrite", "-Wclippy::read_zero_byte_vec",
 	"-Wclippy::readonly_write_lock", "-Wclippy::redundant_clone", "-Wclippy::significant_drop_in_scrutinee", "-Wclippy::significant_drop_tightening",
 	"-Wclippy::string_lit_as_bytes", "-Wclippy::suboptimal_flops", "-Wclippy::suspicious_operation_groupings", "-Wclippy::trailing_empty_array",
 	"-Wclippy::trait_duplication_in_bounds", "-Wclippy::transmute_undefined_repr", "-Wclippy::trivial_regex", "-Wclippy::tuple_array_conversions",
@@ -63,5 +63,6 @@ rustflags = [
 	"-Wclippy::unused_rounding", "-Wclippy::useless_let_if_seq", "-Wclippy::set_contains_or_insert",
 
 	# Cargo
-	"-Wclippy::multiple_crate_versions", "-Fclippy::negative_feature_names", "-Fclippy::redundant_feature_names", "-Fclippy::wildcard_dependencies"
+	# "-Wclippy::multiple_crate_versions", FIXME: make PR to update zerocopy to 0.8
+    "-Fclippy::negative_feature_names", "-Fclippy::redundant_feature_names", "-Fclippy::wildcard_dependencies"
 ]
