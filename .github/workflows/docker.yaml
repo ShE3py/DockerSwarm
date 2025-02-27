@@ -1,6 +1,6 @@
 name: Docker
 
-# Only run on push, or PRs modifying Docker, akin to a CD workflow
+# Only run on push, or PRs modifying Docker, akin to a CD workflow.
 on:
   push:
     branches:

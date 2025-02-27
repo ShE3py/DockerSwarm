@@ -1,15 +1,6 @@
 name: Hive
 
 on:
-  push:
-    branches:
-      - master
-    paths:
-      - hive/**
-      - Cargo.lock
-      - Cargo.toml
-      - .github/workflows/hive.yaml
-  
   pull_request:
     branches:
       - master
