@@ -1,4 +1,4 @@
-name: Hive
+name: Documentation
 
 on:
   pull_request:
@@ -6,32 +6,30 @@ on:
       - master
     paths:
       - hive/**
+      - worker/**
       - Cargo.lock
       - Cargo.toml
       - clippy.toml
-      - .github/workflows/hive.yaml
+      - .github/workflows/docs.yaml
       - .cargo/config.toml
 
 env:
   CARGO_TERM_COLOR: always
   RUSTUP_TERM_COLOR: always
+  RUSTDOCFLAGS: -D warnings
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: ./hive
     
     steps:
       - uses: actions/checkout@v4
       
       - name: Install Wasm target
         run: rustup target add wasm32-unknown-unknown
-        
-      - name: Check
-        run: cargo clippy --target wasm32-unknown-unknown -- -D warnings
       
-      - name: Build
-        run: cargo build --target wasm32-unknown-unknown
+      - name: Document Worker
+        run: cargo doc --no-deps --document-private-items --package worker
+      
+      - name: Document Hive
+        run: cargo doc --target wasm32-unknown-unknown --no-deps --document-private-items --package hive
