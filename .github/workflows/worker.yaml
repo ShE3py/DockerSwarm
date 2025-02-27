@@ -29,6 +29,11 @@ jobs:
       - name: Check
         run: cargo clippy -- -D warnings
       
+      - name: Documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --no-deps --document-private-items
+      
       - name: Build
         run: cargo build
         
