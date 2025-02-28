@@ -1,5 +1,6 @@
 [package]
 name = "worker"
+default-run = "worker"
 version = "0.0.0"
 authors.workspace = true
 repository.workspace = true
@@ -9,6 +10,10 @@ keywords = ["md5"]
 edition.workspace = true
 rust-version.workspace = true
 publish.workspace = true
+
+[[bin]]
+name = "ping"
+path = "src/ping.rs"
 
 [dependencies]
 ctrlc = "3.4.5"
