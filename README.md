@@ -7,7 +7,6 @@ Lancement :
 # docker swarm init --advertise-addr lo
 # docker compose build
 # docker stack deploy -c docker-compose.yaml 64
-# docker stack ps 64
 ```
 
 Puis le site web sera disponible à l’adresse suivante :  
@@ -17,6 +16,18 @@ Puis le site web sera disponible à l’adresse suivante :
 
 - `hive`: le front-end.
 - `worker`: le back-end (lib pour casser des MD5, et bin pour l'exposer via un WebSocket).
+
+## Monitoring
+
+Pour déterminer dynamiquement l'état du stack, l'on peut faire un `ps` en spécifiant
+la sortie dans un format autre qu'humain :
+```
+# docker stack ps 64 --format json
+{"CurrentState":"Running 2 minutes ago","DesiredState":"Running","Error":"","ID":"5zw0yrffuunm","Image":"hive:latest","Name":"64_hive.1","Node":"pastel","Ports":""}
+{"CurrentState":"Running 2 minutes ago","DesiredState":"Running","Error":"","ID":"tlryownwrmkt","Image":"worker:latest","Name":"64_worker.1","Node":"pastel","Ports":""}
+{"CurrentState":"Running 14 seconds ago","DesiredState":"Running","Error":"","ID":"6fpvp0fio3dj","Image":"worker:latest","Name":"64_worker.2","Node":"pastel","Ports":""}
+{"CurrentState":"Running 14 seconds ago","DesiredState":"Running","Error":"","ID":"fz7xgpar5hrc","Image":"worker:latest","Name":"64_worker.3","Node":"pastel","Ports":""}
+```
 
 ## License
 

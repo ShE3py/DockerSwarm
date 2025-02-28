@@ -1,3 +1,6 @@
 # Don't invalidate Docker's cache if these files changed
 docker-compose.yaml
 Dockerfile
+
+# Don't upload the host's build cache
+target/
