@@ -1,0 +1,41 @@
+name: Spy
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - spy/**
+      - Cargo.lock
+      - Cargo.toml
+      - clippy.toml
+      - .github/workflows/spy.yaml
+      - .cargo/config.toml
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./worker
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check
+        run: cargo clippy -- -D warnings
+      
+      - name: Build
+        run: cargo build
+        
+      - name: Test
+        run: cargo test
+      
+      - name: Documentation
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --no-deps --document-private-items

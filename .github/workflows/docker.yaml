@@ -11,7 +11,9 @@ on:
       - master
     paths:
       - docker-compose.yaml
-      - Dockerfile
+      - hive/Dockerfile
+      - spy/Dockerfile
+      - worker/Dockerfile
       - .github/workflows/docker.yaml
 
 jobs:
