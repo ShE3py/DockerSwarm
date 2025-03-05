@@ -10,7 +10,10 @@ RUN rustup target add wasm32-unknown-unknown
 WORKDIR /checkout/
 COPY . .
 
-RUN cd hive && trunk build --release false --minify --skip-version-check --color=always
+ARG PROFILE
+ENV PROFILE=${PROFILE:-release}
+
+RUN cd hive && trunk build --cargo-profile ${PROFILE} --minify --skip-version-check --color=always
 
 FROM nginx:alpine3.21-slim AS hive
 COPY --from=builder /checkout/hive/dist /usr/share/nginx/html
