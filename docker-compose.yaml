@@ -2,7 +2,8 @@ services:
   worker:
     image: worker
     build:
-      target: worker
+      context: .
+      dockerfile: worker/Dockerfile
     
     ports:
       - '3000:3000'
@@ -10,7 +11,8 @@ services:
   spy:
     image: spy
     build:
-      target: spy
+      context: .
+      dockerfile: spy/Dockerfile
     
     depends_on:
       - worker
@@ -20,10 +22,11 @@ services:
         source: /var/run/docker.sock
         target: /var/run/docker.sock
   
-#  hive:
-#    image: hive
-#    build:
-#      target: hive
-#
-#    ports:
-#      - '8080:80'
+  hive:
+    image: hive
+    build:
+      context: .
+      dockerfile: hive/Dockerfile
+
+    ports:
+      - '8080:80'
