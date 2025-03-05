@@ -9,14 +9,22 @@ RUN rustup target add wasm32-unknown-unknown
 WORKDIR /usr/src/workspace
 COPY . .
 
-RUN cargo install --path worker
-RUN cd hive && trunk build --release --minify --skip-version-check --color=always
+RUN cargo install --path worker --profile dev
+RUN cargo install --path spy --profile dev
+#RUN cd hive && trunk build --release --minify --skip-version-check --color=always
 
 
 FROM alpine:3.21 AS worker
 COPY --from=builder /usr/local/cargo/bin/worker /usr/local/bin/worker
+# HEALTHCHECK --timeout=5s --retries=1 CMD ["ping"]
 ENTRYPOINT ["worker"]
 
+FROM alpine:3.21 AS spy
+RUN apk add --no-cache docker
+COPY --from=builder /usr/local/cargo/bin/spy /usr/local/bin/spy
+# HEALTHCHECK --timeout=5s --retries=1 CMD ["ping"]
+ENTRYPOINT ["spy"]
 
-FROM nginx:alpine3.21-slim AS hive
-COPY --from=builder /usr/src/workspace/hive/dist /usr/share/nginx/html
+
+#FROM nginx:alpine3.21-slim AS hive
+#COPY --from=builder /usr/src/workspace/hive/dist /usr/share/nginx/html
