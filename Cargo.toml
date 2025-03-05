@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "hive",
+    "spy",
     "worker",
 ]
 resolver = "2"
@@ -21,6 +22,7 @@ lto = "fat"
 opt-level = "z"
 
 [workspace.dependencies]
+ctrlc = "3.4.5"
 hex = "0.4.3"
 log = "0.4.26"
 md5 = "0.7.0"

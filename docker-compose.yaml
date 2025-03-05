@@ -7,10 +7,23 @@ services:
     ports:
       - '3000:3000'
   
-  hive:
-    image: hive
+  spy:
+    image: spy
     build:
-      target: hive
+      target: spy
     
-    ports:
-      - '8080:80'
+    depends_on:
+      - worker
+    
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+  
+#  hive:
+#    image: hive
+#    build:
+#      target: hive
+#
+#    ports:
+#      - '8080:80'
