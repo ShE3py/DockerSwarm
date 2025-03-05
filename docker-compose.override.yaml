@@ -1,0 +1,11 @@
+services:
+  worker:
+    build:
+      args:
+        PROFILE: dev
+  
+  spy:
+    image: spy
+    build:
+      args:
+        PROFILE: dev
