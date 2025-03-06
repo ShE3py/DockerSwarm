@@ -45,9 +45,9 @@ pub(crate) struct Manual {
     #[garde(skip)]
     in_progress: AtomicU8,
     
-    /// The websocket.
+    /// The worker's websocket.
     #[garde(skip)]
-    socks: OnceCell<WebSocket>,
+    worker: OnceCell<WebSocket>,
     
     /// The last broken MD5 (or error message).
     #[garde(skip)]
@@ -108,16 +108,16 @@ fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
 }
 
 impl Manual {
-    pub(crate) fn new(thighs: &WebSocket) -> Rc<Manual> {
+    pub(crate) fn new(worker: &WebSocket) -> Rc<Manual> {
         let this = Rc::new(Manual::default());
         
         // on open
         let that = Rc::clone(&this);
-        let ws = thighs.clone();
+        let ws = worker.clone();
         let on_open = Closure::<dyn FnMut()>::new(move || {
-            that.socks.set(ws.clone()).unwrap();
+            that.worker.set(ws.clone()).unwrap();
         });
-        thighs.set_onopen(Some(on_open.as_ref().unchecked_ref()));
+        worker.set_onopen(Some(on_open.as_ref().unchecked_ref()));
         on_open.forget();
         
         // on message
@@ -126,7 +126,7 @@ impl Manual {
             that.result.replace(e.data().as_string().expect("got a non-string msg"));
             that.in_progress.fetch_sub(1, Ordering::SeqCst);
         });
-        thighs.set_onmessage(Some(on_message.as_ref().unchecked_ref()));
+        worker.set_onmessage(Some(on_message.as_ref().unchecked_ref()));
         on_message.forget();
         
         this
@@ -135,7 +135,7 @@ impl Manual {
     pub(crate) fn ui(self: &Rc<Manual>, ctx: &Context, ui: &mut Ui) {
         ui.heading("Hive");
         
-        if self.socks.get().is_none() {
+        if self.worker.get().is_none() {
             ui.horizontal(|ui| {
                 ui.label("Connexion…");
                 ui.spinner();
@@ -263,7 +263,7 @@ impl Manual {
         self.in_progress.fetch_add(1, Ordering::SeqCst);
         info!("MD5: {:?}", self.md5);
         
-        let ws = self.socks.get().unwrap();
+        let ws = self.worker.get().unwrap();
         if let Err(e) = ws.send_with_str(self.md5.borrow().deref()) {
             error!("send(): {e:?}");
         }
@@ -278,7 +278,7 @@ impl Default for Manual {
             word: RefCell::new("1234".to_owned()),
             md5: RefCell::new("81dc9bdb52d04dc20036dbd8313ed055".to_owned()),
             in_progress: AtomicU8::new(0),
-            socks: OnceCell::new(),
+            worker: OnceCell::new(),
             result: RefCell::new("1234".to_owned()),
         }
     }

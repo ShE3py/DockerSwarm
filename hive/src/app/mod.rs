@@ -13,11 +13,11 @@ pub(crate) struct Hive {
 }
 
 impl Hive {
-    pub(crate) fn new(ccx: &CreationContext<'_>, thighs: &WebSocket) -> Hive {
+    pub(crate) fn new(ccx: &CreationContext<'_>, worker: &WebSocket) -> Hive {
         ccx.egui_ctx.set_pixels_per_point(1.2);
         
         Hive {
-            manual: Manual::new(thighs),
+            manual: Manual::new(worker),
         }
     }
 }
