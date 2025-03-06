@@ -11,6 +11,8 @@ ENV PROFILE=${PROFILE:-release}
 
 RUN cargo install --path spy --profile $PROFILE
 
-FROM alpine:3.21 AS worker
+FROM alpine:3.21 AS spy
+RUN apk add --no-cache docker
+
 COPY --from=builder /usr/local/cargo/bin/spy /usr/local/bin/spy
 ENTRYPOINT ["spy"]

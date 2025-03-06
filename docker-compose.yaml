@@ -4,29 +4,34 @@ services:
     build:
       context: .
       dockerfile: worker/Dockerfile
-    
     ports:
       - '3000:3000'
+    deploy:
+      mode: replicated
+      replicas: 2
   
   spy:
     image: spy
     build:
       context: .
       dockerfile: spy/Dockerfile
-    
     depends_on:
       - worker
-    
     volumes:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
+    ports:
+      - '4000:4000'
+    deploy:
+      mode: global
   
   hive:
     image: hive
     build:
       context: .
       dockerfile: hive/Dockerfile
-
     ports:
       - '8080:80'
+    deploy:
+      mode: global

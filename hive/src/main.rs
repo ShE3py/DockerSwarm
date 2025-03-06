@@ -23,8 +23,9 @@ fn main() {
             .document()
             .expect("No document");
         
-        // Connexion au websocket
+        // Connexion aux websockets
         let worker = WebSocket::new("ws://localhost:3000").unwrap();
+        let spy = WebSocket::new("ws://localhost:4000").unwrap();
         
         let canvas = document
             .get_element_by_id("the_canvas_id")
@@ -37,7 +38,7 @@ fn main() {
             .start(
                 canvas,
                 web_options,
-                Box::new(move |rcx| Ok(Box::new(Hive::new(rcx, &worker)))),
+                Box::new(move |rcx| Ok(Box::new(Hive::new(rcx, &worker, &spy)))),
                 // TODO ^ add suggestion for `move`
             )
             .await;
