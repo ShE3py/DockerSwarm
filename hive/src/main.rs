@@ -24,7 +24,7 @@ fn main() {
             .expect("No document");
         
         // Connexion au websocket
-        let thighs = WebSocket::new("ws://localhost:3000").unwrap();
+        let worker = WebSocket::new("ws://localhost:3000").unwrap();
         
         let canvas = document
             .get_element_by_id("the_canvas_id")
@@ -37,7 +37,7 @@ fn main() {
             .start(
                 canvas,
                 web_options,
-                Box::new(move |rcx| Ok(Box::new(Hive::new(rcx, &thighs)))),
+                Box::new(move |rcx| Ok(Box::new(Hive::new(rcx, &worker)))),
                 // TODO ^ add suggestion for `move`
             )
             .await;
