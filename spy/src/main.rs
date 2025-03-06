@@ -1,13 +1,20 @@
+use crate::websocket::WebSocket;
 use spy::stack;
 use std::process::exit;
 use std::thread;
 use std::time::Duration;
+
+
+// A good spy spy its target.
+#[path = "../../worker/src/websocket.rs"]
+mod websocket;
 
 fn main() {
     ::ctrlc::set_handler(|| {
         exit(130);
     }).unwrap();
     
+    let mut server = WebSocket::new(4000);
     loop {
         thread::sleep(Duration::from_secs(5));
         
@@ -29,5 +36,9 @@ fn main() {
                 });
         
         println!("Available: {working}/{workers}");
+        
+        server.cleanse();
+        server.accept();
+        server.broadcast(format!("{working}/{workers}"));
     }
 }

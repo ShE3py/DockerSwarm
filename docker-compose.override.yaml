@@ -9,3 +9,9 @@ services:
     build:
       args:
         PROFILE: dev
+  
+  hive:
+    image: hive
+    build:
+      args:
+        PROFILE: dev
