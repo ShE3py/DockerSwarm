@@ -2,7 +2,7 @@ use crate::websocket::WebSocket;
 use spy::stack;
 use std::process::exit;
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 
 // A good spy spy its target.
@@ -15,8 +15,15 @@ fn main() {
     }).unwrap();
     
     let mut server = WebSocket::new(4000);
+    let mut deadline = Instant::now();
+    const DELAY: Duration = Duration::from_secs(1);
     loop {
-        thread::sleep(Duration::from_secs(5));
+        // Wait a most 1s
+        let now = Instant::now();
+        if let Some(delay) = deadline.checked_duration_since(now) {
+            thread::sleep(delay);
+        }
+        deadline = now + DELAY;
         
         println!();
         let (working, workers) =
