@@ -15,19 +15,18 @@ Puis le site web sera disponible à l’adresse suivante :
 ## Crates
 
 - `hive`: le front-end.
-- `worker`: le back-end (lib pour casser des MD5, et bin pour l'exposer via un WebSocket).
+- `worker`: le back-end (lib pour casser des MD5, et bin pour l’exposer via un WebSocket).
+- `spy`: le moniteur (auto-scaling, expose le nombre de serveurs via un WebSocket)
 
-## Monitoring
+## Bogues
 
-Pour déterminer dynamiquement l'état du stack, l'on peut faire un `ps` en spécifiant
-la sortie dans un format autre qu'humain :
-```
-# docker stack ps 64 --format json
-{"CurrentState":"Running 2 minutes ago","DesiredState":"Running","Error":"","ID":"5zw0yrffuunm","Image":"hive:latest","Name":"64_hive.1","Node":"pastel","Ports":""}
-{"CurrentState":"Running 2 minutes ago","DesiredState":"Running","Error":"","ID":"tlryownwrmkt","Image":"worker:latest","Name":"64_worker.1","Node":"pastel","Ports":""}
-{"CurrentState":"Running 14 seconds ago","DesiredState":"Running","Error":"","ID":"6fpvp0fio3dj","Image":"worker:latest","Name":"64_worker.2","Node":"pastel","Ports":""}
-{"CurrentState":"Running 14 seconds ago","DesiredState":"Running","Error":"","ID":"fz7xgpar5hrc","Image":"worker:latest","Name":"64_worker.3","Node":"pastel","Ports":""}
-```
+Le navigateur Internet se connecte parfois à un worker qui travaille, la solution miracle
+est de faire <kbd>Ctrl</kbd> + <kbd>F5</kbd>.
+
+S’il y a écrit « Connexion… », c’est qu’il attend de faire l’handshaking avec le worker.
+
+S’il dit qu’il y a 0 workers actifs/disponibles, c’est qu’il n’est pas encore
+connecté/n’a pas encore reçu de message du spy.
 
 ## License
 
