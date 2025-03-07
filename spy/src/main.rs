@@ -67,7 +67,7 @@ fn main() {
         }
         
         // Scale down
-        if workers > 4 && responding > workers / 2 {
+        if workers >= 4 && responding > workers / 2 {
             docker::service::scale(WORKERS, workers / 2);
         }
     }
