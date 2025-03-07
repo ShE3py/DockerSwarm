@@ -1,7 +1,7 @@
 use eframe::wasm_bindgen::closure::Closure;
 use std::cell::{Cell, OnceCell};
 use std::rc::Rc;
-use eframe::egui::{Context, Window};
+use eframe::egui::{Align2, Context, Window};
 use web_sys::wasm_bindgen::JsCast as _;
 use web_sys::{MessageEvent, WebSocket};
 
@@ -55,12 +55,12 @@ impl Monitor {
     }
     
     pub(crate) fn show(self: &Rc<Monitor>, ctx: &Context) {
-        Window::new("Moniteur").resizable(false).show(ctx, |ui| {
+        Window::new("Moniteur").anchor(Align2::RIGHT_TOP, [-16.0, 40.0]).collapsible(false).resizable(false).show(ctx, |ui| {
             let workers = self.workers.get();
             let available = self.working.get();
             
-            ui.label(format!("Workers actifs: {workers}"));
-            ui.label(format!("Workers disponibles: {available}"));
+            ui.label(format!("Workers actifs : {workers}"));
+            ui.label(format!("Workers disponibles : {available}"));
         });
     }
 }
