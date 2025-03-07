@@ -1,9 +1,8 @@
 use crate::app::home::Home;
+use crate::app::monitor::Monitor;
 use eframe::{egui, App, CreationContext, Frame};
 use egui::{CentralPanel, Context, TopBottomPanel};
 use std::rc::Rc;
-use web_sys::WebSocket;
-use crate::app::monitor::Monitor;
 
 mod home;
 mod monitor;
@@ -18,12 +17,12 @@ pub(crate) struct Hive {
 }
 
 impl Hive {
-    pub(crate) fn new(ccx: &CreationContext<'_>, worker: &WebSocket, spy: &WebSocket) -> Hive {
+    pub(crate) fn new(ccx: &CreationContext<'_>) -> Hive {
         ccx.egui_ctx.set_pixels_per_point(1.2);
         
         Hive {
-            home: Home::new(worker),
-            monitor: Monitor::new(spy),
+            home: Home::new(),
+            monitor: Monitor::new(),
         }
     }
 }

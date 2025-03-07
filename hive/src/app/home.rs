@@ -1,10 +1,10 @@
-use std::any::type_name;
 use eframe::egui::{Context, FontFamily, Key, RichText, TextEdit, TextStyle, Ui, Widget as _};
 use eframe::wasm_bindgen::closure::Closure;
 use egui_form::garde::{field_path, GardeReport};
 use egui_form::{Form, FormField};
 use garde::Validate;
-use std::cell::{Cell, OnceCell, RefCell};
+use std::any::type_name;
+use std::cell::{Cell, RefCell};
 use std::num::NonZero;
 use std::ops::{Deref as _, DerefMut as _};
 use std::rc::Rc;
@@ -47,7 +47,7 @@ pub(crate) struct Home {
     
     /// The worker's websocket.
     #[garde(skip)]
-    worker: OnceCell<WebSocket>,
+    worker: RefCell<Option<WebSocket>>,
     
     /// The last broken MD5 (or error message).
     #[garde(skip)]
@@ -108,34 +108,16 @@ fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
 }
 
 impl Home {
-    pub(crate) fn new(worker: &WebSocket) -> Rc<Home> {
+    pub(crate) fn new() -> Rc<Home> {
         let this = Rc::new(Home::default());
-        
-        // on open
-        let that = Rc::clone(&this);
-        let ws = worker.clone();
-        let on_open = Closure::<dyn FnMut()>::new(move || {
-            that.worker.set(ws.clone()).unwrap();
-        });
-        worker.set_onopen(Some(on_open.as_ref().unchecked_ref()));
-        on_open.forget();
-        
-        // on message
-        let that = Rc::clone(&this);
-        let on_message = Closure::<dyn FnMut(_)>::new(move |e: MessageEvent| {
-            that.result.replace(e.data().as_string().expect("got a non-string msg"));
-            that.in_progress.fetch_sub(1, Ordering::SeqCst);
-        });
-        worker.set_onmessage(Some(on_message.as_ref().unchecked_ref()));
-        on_message.forget();
-        
+        this.connect();
         this
     }
     
     pub(crate) fn ui(self: &Rc<Home>, ctx: &Context, ui: &mut Ui) {
         ui.heading("Hive");
         
-        if self.worker.get().is_none() {
+        if self.worker.borrow().is_none() {
             ui.horizontal(|ui| {
                 ui.label("Connexion…");
                 ui.spinner();
@@ -260,13 +242,54 @@ impl Home {
     
     /// Send a MD5 break request to the worker.
     fn ws_send(&self) {
+        let lock = self.worker.borrow();
+        let Some(ws) = lock.as_ref() else {
+            warn!("`ws_send` called when disconnected");
+            return;
+        };
+        
         self.in_progress.fetch_add(1, Ordering::SeqCst);
         info!("MD5: {:?}", self.md5);
         
-        let ws = self.worker.get().unwrap();
         if let Err(e) = ws.send_with_str(self.md5.borrow().deref()) {
             error!("send(): {e:?}");
         }
+    }
+    
+    /// Connect to the worker
+    fn connect(self: &Rc<Home>) {
+        info!("Connexion au worker...");
+        let worker = WebSocket::new("ws://localhost:3000").unwrap();
+        
+        // on open
+        let this = Rc::clone(self);
+        let ws = worker.clone();
+        let on_open = Closure::<dyn FnMut()>::new(move || {
+            info!("Connecté au worker.");
+            this.worker.replace(Some(ws.clone()));
+        });
+        worker.set_onopen(Some(on_open.as_ref().unchecked_ref()));
+        on_open.forget();
+        
+        // on close
+        let this = Rc::clone(self);
+        let on_close = Closure::<dyn FnMut()>::new(move || {
+            this.worker.replace(None);
+            this.in_progress.store(0, Ordering::SeqCst); // the worker lost us
+            this.connect();
+        });
+        worker.set_onclose(Some(on_close.as_ref().unchecked_ref()));
+        on_close.forget();
+        
+        
+        // on message
+        let this = Rc::clone(self);
+        let on_message = Closure::<dyn FnMut(_)>::new(move |e: MessageEvent| {
+            this.result.replace(e.data().as_string().expect("got a non-string msg"));
+            this.in_progress.fetch_sub(1, Ordering::SeqCst);
+        });
+        worker.set_onmessage(Some(on_message.as_ref().unchecked_ref()));
+        on_message.forget();
     }
 }
 
@@ -278,7 +301,7 @@ impl Default for Home {
             word: RefCell::new("1234".to_owned()),
             md5: RefCell::new("81dc9bdb52d04dc20036dbd8313ed055".to_owned()),
             in_progress: AtomicU8::new(0),
-            worker: OnceCell::new(),
+            worker: RefCell::default(),
             result: RefCell::new("1234".to_owned()),
         }
     }

@@ -3,11 +3,10 @@
 #[macro_use]
 extern crate log;
 
+use crate::app::Hive;
+use eframe::wasm_bindgen::JsCast as _;
 use eframe::{WebLogger, WebOptions, WebRunner};
 use log::LevelFilter;
-use web_sys::WebSocket;
-use eframe::wasm_bindgen::JsCast as _;
-use crate::app::Hive;
 
 mod app;
 
@@ -23,10 +22,6 @@ fn main() {
             .document()
             .expect("No document");
         
-        // Connexion aux websockets
-        let worker = WebSocket::new("ws://localhost:3000").unwrap();
-        let spy = WebSocket::new("ws://localhost:4000").unwrap();
-        
         let canvas = document
             .get_element_by_id("the_canvas_id")
             .expect("Failed to find the_canvas_id")
@@ -38,8 +33,7 @@ fn main() {
             .start(
                 canvas,
                 web_options,
-                Box::new(move |rcx| Ok(Box::new(Hive::new(rcx, &worker, &spy)))),
-                // TODO ^ add suggestion for `move`
+                Box::new(|rcx| Ok(Box::new(Hive::new(rcx)))),
             )
             .await;
         
