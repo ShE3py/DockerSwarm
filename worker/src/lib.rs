@@ -4,7 +4,7 @@ use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 
 /// Le nombre maximal de caractères à essayer, avant de renvoyer [`BreakError`].
-pub const MAX_LEN: usize = 5;
+pub const MAX_LEN: usize = 4;
 
 /// Tente de retrouver un texte alphanumérique (`A-Za-z0-9`) correspondant à un condensat MD5.
 ///

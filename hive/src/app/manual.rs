@@ -54,7 +54,7 @@ pub(crate) struct Manual {
     result: RefCell<String>,
 }
 
-const MAX_LEN: usize = 5;
+const MAX_LEN: usize = 4;
 
 fn validate_word(word: &RefCell<String>, _cx: &()) -> garde::Result {
     let lock = word.borrow();
