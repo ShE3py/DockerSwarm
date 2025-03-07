@@ -155,12 +155,14 @@ impl Home {
                             let this = Rc::clone(self);
                             let ctx = ctx.clone();
                             let on_interval = Closure::<dyn FnMut()>::new(move || {
-                                let word = String::from_utf8(fastrand::choose_multiple(ALPHABET.iter().copied(), 4)).expect("bad generated word?");
-                                
-                                this.word.replace(word);
-                                this.update_md5();
-                                this.ws_send();
-                                ctx.request_repaint();
+                                if this.in_progress.load(Ordering::Relaxed) < 5 {
+                                    let word = String::from_utf8(fastrand::choose_multiple(ALPHABET.iter().copied(), 4)).expect("bad generated word?");
+                                    
+                                    this.word.replace(word);
+                                    this.update_md5();
+                                    this.ws_send();
+                                    ctx.request_repaint();
+                                }
                             });
                             match window.set_interval_with_callback_and_timeout_and_arguments_0(on_interval.as_ref().unchecked_ref(), interval) {
                                 Ok(0) => error!("setInterval(): returned 0?"),
@@ -244,7 +246,6 @@ impl Home {
     fn ws_send(&self) {
         let lock = self.worker.borrow();
         let Some(ws) = lock.as_ref() else {
-            warn!("`ws_send` called when disconnected");
             return;
         };
         
