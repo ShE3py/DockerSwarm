@@ -8,7 +8,11 @@ RUN apk add --no-cache trunk
 RUN rustup target add wasm32-unknown-unknown
 
 WORKDIR /checkout/
-COPY . .
+COPY Cargo.toml Cargo.lock ./
+COPY hive hive
+
+# Delete `spy` and `worker` lines from the workspace's members
+RUN sed -i '4d;5d' Cargo.toml
 
 ARG PROFILE
 ENV PROFILE=${PROFILE:-release}
