@@ -33,8 +33,9 @@ pub struct NetworkSpec {
 pub struct Address(IpAddr);
 
 
+/// Return low-level information on Docker objects.
 pub fn inspect(id: impl AsRef<OsStr>) -> Option<Container> {
-    let stdout = super::docker(["inspect"], &id);
+    let stdout = super::docker(["inspect", "--format", "json"], &id);
     
     match serde_json::from_slice::<Vec<Container>>(&stdout) {
         Ok(mut v) => v.pop(),

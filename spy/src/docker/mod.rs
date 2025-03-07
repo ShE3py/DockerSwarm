@@ -1,13 +1,16 @@
 use std::ffi::OsStr;
 use std::process::Command;
 
-pub mod inspect;
+mod inspect;
+pub mod service;
 pub mod stack;
+
+pub use inspect::*;
 
 /// Returns the stdout of a Docker command.
 pub fn docker<const N: usize>(args: [&'static str; N], arg: impl AsRef<OsStr>) -> Vec<u8> {
     let mut cmd = Command::new("docker");
-    cmd.args(args).arg(arg).args(["--format", "json"]);
+    cmd.args(args).arg(arg);
     
     match cmd.output() {
         // FIXME: use [`ExitStatus::exit_ok`] when stable

@@ -11,7 +11,7 @@ pub struct Task {
 }
 
 pub fn ps(stack: impl AsRef<OsStr>) -> Vec<Task> {
-    let stdout = super::docker(["stack", "ps"], stack);
+    let stdout = super::docker(["stack", "ps", "--format", "json"], stack);
     
     stdout.split(|b| *b == b'\n')
         .filter_map(|line| Some(line.trim_ascii()).filter(|line| !line.is_empty()))
