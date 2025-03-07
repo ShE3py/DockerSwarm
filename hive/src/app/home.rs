@@ -24,7 +24,7 @@ enum Mode {
 
 /// User-specified manual MD5 break.
 #[derive(Debug, Validate)]
-pub(crate) struct Manual {
+pub(crate) struct Home {
     /// The auto-try mode.
     #[garde(skip)]
     mode: Cell<Mode>,
@@ -107,9 +107,9 @@ fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
     }
 }
 
-impl Manual {
-    pub(crate) fn new(worker: &WebSocket) -> Rc<Manual> {
-        let this = Rc::new(Manual::default());
+impl Home {
+    pub(crate) fn new(worker: &WebSocket) -> Rc<Home> {
+        let this = Rc::new(Home::default());
         
         // on open
         let that = Rc::clone(&this);
@@ -132,7 +132,7 @@ impl Manual {
         this
     }
     
-    pub(crate) fn ui(self: &Rc<Manual>, ctx: &Context, ui: &mut Ui) {
+    pub(crate) fn ui(self: &Rc<Home>, ctx: &Context, ui: &mut Ui) {
         ui.heading("Hive");
         
         if self.worker.get().is_none() {
@@ -270,9 +270,9 @@ impl Manual {
     }
 }
 
-impl Default for Manual {
+impl Default for Home {
     fn default() -> Self {
-        Manual {
+        Home {
             mode: Cell::new(Mode::default()),
             interval: Cell::new(None),
             word: RefCell::new("1234".to_owned()),

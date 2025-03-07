@@ -1,17 +1,17 @@
-use crate::app::manual::Manual;
+use crate::app::home::Home;
 use eframe::{egui, App, CreationContext, Frame};
 use egui::{CentralPanel, Context, TopBottomPanel};
 use std::rc::Rc;
 use web_sys::WebSocket;
 use crate::app::monitor::Monitor;
 
-mod manual;
+mod home;
 mod monitor;
 
 #[derive(Debug)]
 pub(crate) struct Hive {
     /// User-initiated manual MD5 break
-    manual: Rc<Manual>,
+    home: Rc<Home>,
     
     /// Swarm workers monitor.
     monitor: Rc<Monitor>,
@@ -22,7 +22,7 @@ impl Hive {
         ccx.egui_ctx.set_pixels_per_point(1.2);
         
         Hive {
-            manual: Manual::new(worker),
+            home: Home::new(worker),
             monitor: Monitor::new(spy),
         }
     }
@@ -39,7 +39,7 @@ impl App for Hive {
         });
         
         CentralPanel::default().show(ctx, |ui| {
-            self.manual.ui(ctx, ui);
+            self.home.ui(ctx, ui);
         });
         
         self.monitor.show(ctx);
