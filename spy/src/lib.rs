@@ -1,4 +1,4 @@
-mod docker;
+pub mod docker;
 mod ping;
 
-pub use docker::{docker, inspect, stack};
+pub use ping::ping;
