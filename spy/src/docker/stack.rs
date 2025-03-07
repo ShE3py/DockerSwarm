@@ -1,3 +1,7 @@
+//!
+//! Docker stack utilities.
+//!
+
 use serde::Deserialize;
 use std::ffi::OsStr;
 
@@ -10,6 +14,7 @@ pub struct Task {
     pub id: String,
 }
 
+/// List the tasks in a stack.
 pub fn ps(stack: impl AsRef<OsStr>) -> Vec<Task> {
     let stdout = super::docker(["stack", "ps", "--format", "json"], stack);
     

@@ -1,6 +1,10 @@
+//!
+//! The monitor (i.e. number of workers) window.
+//!
+
 use eframe::egui::{Align2, Context, Window};
 use eframe::wasm_bindgen::closure::Closure;
-use std::cell::{Cell, RefCell};
+use std::cell::Cell;
 use std::rc::Rc;
 use web_sys::wasm_bindgen::JsCast as _;
 use web_sys::{MessageEvent, WebSocket};

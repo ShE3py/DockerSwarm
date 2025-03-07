@@ -1,3 +1,7 @@
+//!
+//! Private utilities. Proxy for neat `docker::` naming!
+//!
+
 use std::ffi::OsStr;
 use std::process::Command;
 
@@ -7,7 +11,7 @@ pub mod stack;
 
 pub use inspect::*;
 
-/// Returns the stdout of a Docker command.
+/// Returns the stdout of a Docker command, or an empty vec in case of failure.
 pub fn docker<const N: usize>(args: [&'static str; N], arg: impl AsRef<OsStr>) -> Vec<u8> {
     let mut cmd = Command::new("docker");
     cmd.args(args).arg(arg);

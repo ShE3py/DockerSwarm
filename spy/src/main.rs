@@ -1,3 +1,11 @@
+//!
+//! Periodically check how all the workers in a Swarm are working,
+//! broadcasting it throught a websocket.
+//!
+//! Port: 4000
+//! Response: responding/total workers, i.e. two stringified [`u32`] separated by a `/`.
+//!
+
 use crate::websocket::WebSocket;
 use spy::{self, docker};
 use std::process::exit;

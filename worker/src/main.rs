@@ -1,3 +1,11 @@
+//!
+//! Websocket for breaking MD5 hashes.
+//!
+//! Port: 3000
+//! Query: send the MD5 as a hex string
+//! Response: the broken word, or an error message
+//!
+
 use crate::websocket::WebSocket;
 use std::process::exit;
 use std::thread;
