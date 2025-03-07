@@ -4,7 +4,14 @@ RUN apk add --no-cache musl-dev
 ENV RUSTUP_TERM_COLOR=always CARGO_TERM_COLOR=always
 
 WORKDIR /checkout/
-COPY . .
+COPY Cargo.toml Cargo.lock ./
+COPY spy spy
+
+# FIXME: hack
+COPY worker/src/websocket.rs worker/src/websocket.rs
+
+# Delete `hive` and `worker` lines from the workspace's members
+RUN sed -i '3d;5d' Cargo.toml
 
 ARG PROFILE
 ENV PROFILE=${PROFILE:-release}
