@@ -14,9 +14,9 @@ Puis le site web sera disponible à l’adresse suivante :
 
 ## Crates
 
-- `hive`: le front-end.
-- `worker`: le back-end (lib pour casser des MD5, et bin pour l’exposer via un WebSocket).
-- `spy`: le moniteur (auto-scaling, expose le nombre de serveurs via un WebSocket)
+- `hive`: le front-end (port 8080).
+- `worker`: le back-end (lib pour casser des MD5, et bin pour l’exposer via un WebSocket, port 3000).
+- `spy`: le moniteur (auto-scaling, expose le nombre de serveurs via un WebSocket, port 4000)
 
 ## Bogues
 

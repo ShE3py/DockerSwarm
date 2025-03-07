@@ -1,3 +1,7 @@
+//!
+//! Library for breaking MD5 hashes.
+//!
+
 use hex::FromHexError;
 use md5::Digest;
 use std::error::Error;

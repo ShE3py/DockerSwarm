@@ -1,3 +1,7 @@
+//!
+//! The main panel, where everything is.
+//!
+
 use eframe::egui::{Context, FontFamily, Key, RichText, TextEdit, TextStyle, Ui, Widget as _};
 use eframe::wasm_bindgen::closure::Closure;
 use egui_form::garde::{field_path, GardeReport};
@@ -56,6 +60,7 @@ pub(crate) struct Home {
 
 const MAX_LEN: usize = 4;
 
+/// Field validation: the word that is MD5 hashed and then sent to the MD5 breaker (testing utility).
 fn validate_word(word: &RefCell<String>, _cx: &()) -> garde::Result {
     let lock = word.borrow();
     let s = (*lock).as_str().trim();
@@ -65,6 +70,22 @@ fn validate_word(word: &RefCell<String>, _cx: &()) -> garde::Result {
     }
     else if s.chars().any(|c| !c.is_ascii_alphanumeric()) {
         Err(garde::Error::new("Le mot doit être alphanumérique"))
+    }
+    else {
+        Ok(())
+    }
+}
+
+/// Field validation: the MD5.
+fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
+    let lock = md5.borrow();
+    let s = (*lock).as_str().trim();
+    
+    if s.chars().any(|c| !c.is_ascii_hexdigit()) {
+        Err(garde::Error::new("Le MD5 doit être hexadécimal"))
+    }
+    else if s.len() != 32 {
+        Err(garde::Error::new("Le MD5 doit faire 32 caractères"))
     }
     else {
         Ok(())
@@ -90,21 +111,6 @@ fn word_complexity(word: &str) -> f32 {
         .fold(0, U::saturating_add);
     
     (c as f32).log2() * (10.0 / U::BITS as f32)
-}
-
-fn validate_md5(md5: &RefCell<String>, _cx: &()) -> garde::Result {
-    let lock = md5.borrow();
-    let s = (*lock).as_str().trim();
-    
-    if s.chars().any(|c| !c.is_ascii_hexdigit()) {
-        Err(garde::Error::new("Le MD5 doit être hexadécimal"))
-    }
-    else if s.len() != 32 {
-        Err(garde::Error::new("Le MD5 doit faire 32 caractères"))
-    }
-    else {
-        Ok(())
-    }
 }
 
 impl Home {

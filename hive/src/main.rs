@@ -1,3 +1,7 @@
+//!
+//! Webapp (wasm-only) as a frontend for MD5 breaking.
+//!
+
 #![cfg(target_arch = "wasm32")]
 
 #[macro_use]

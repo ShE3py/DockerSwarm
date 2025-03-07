@@ -1,20 +1,30 @@
+//!
+//! WebSocket server utility.
+//!
+
 #![expect(dead_code, reason = "either `read` or `broadcast` is unused")]
 
 use std::io::ErrorKind;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr, TcpListener, TcpStream};
 use std::process::exit;
-use tungstenite::{Message, Utf8Bytes};
-use tungstenite::protocol::CloseFrame;
 use tungstenite::protocol::frame::coding::CloseCode;
+use tungstenite::protocol::CloseFrame;
+use tungstenite::{Message, Utf8Bytes};
 
+/// A client socket.
 pub(super) type Leech = ::tungstenite::WebSocket<TcpStream>;
 
+/// A WebSocket server socket.
 pub(super) struct WebSocket {
+    /// The socket.
     socket: TcpListener,
+    
+    /// The connected client sockets.
     clients: Vec<Leech>,
 }
 
 impl WebSocket {
+    /// Bind a new WebSocket server to a port.
     pub(super) fn new(port: u16) -> WebSocket {
         let addr = SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), port);
         let server = match TcpListener::bind(addr) {
@@ -37,7 +47,7 @@ impl WebSocket {
         }
     }
     
-    /// Accept incoming connections.
+    /// Handle incomming client sockets (i.e. handshaking).
     pub(super) fn accept(&mut self) {
         loop {
             match self.socket.accept() {
@@ -63,12 +73,12 @@ impl WebSocket {
         }
     }
     
-    /// Remove closed connections.
+    /// Remove closed client sockets.
     pub(super) fn cleanse(&mut self) {
         self.clients.retain(Leech::can_write);
     }
     
-    /// Read from all clients.
+    /// Read from all clients. `f` is called with the client socket, and the message it sent.
     pub(super) fn read<F: FnMut(&mut Leech, Message)>(&mut self, mut f: F) {
         for leech in &mut self.clients {
             let msg = match leech.read() {
@@ -88,6 +98,7 @@ impl WebSocket {
         }
     }
     
+    /// Send a message to a client socket. Terminate the client on error.
     pub(super) fn send(leech: &mut Leech, message: impl Into<Utf8Bytes>) {
         if let Err(e) = leech.send(Message::text(message)) {
             eprintln!("ws send: {e}");
@@ -99,6 +110,7 @@ impl WebSocket {
         }
     }
     
+    /// Broadcast a message to all client sockets.
     pub(super) fn broadcast(&mut self, message: impl Into<Utf8Bytes>) {
         let message = message.into();
         for leech in &mut self.clients {

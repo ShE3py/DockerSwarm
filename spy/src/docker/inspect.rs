@@ -1,8 +1,12 @@
+//!
+//! Utilites for inspecting Docker containers.
+//!
+
+use serde::de::{Error, Visitor};
 use serde::{Deserialize, Deserializer};
 use std::ffi::OsStr;
 use std::fmt::{self, Formatter};
 use std::net::IpAddr;
-use serde::de::{Error, Visitor};
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "PascalCase")]
@@ -49,6 +53,7 @@ pub fn inspect(id: impl AsRef<OsStr>) -> Option<Container> {
 
 
 impl Container {
+    /// Returns the first IP on a specified network.
     pub fn get_ip(&self, network: &str) -> Option<IpAddr> {
         self.networks_attachments.iter()
             .find(|net_at| net_at.network.spec.name == network)
@@ -56,7 +61,7 @@ impl Container {
     }
 }
 
-// Ignore le masque “/24”
+// Deserializer to ignore the /24 mask
 impl<'de> Deserialize<'de> for Address {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
