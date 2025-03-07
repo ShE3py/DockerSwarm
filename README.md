@@ -18,10 +18,9 @@ Puis le site web sera disponible à l’adresse suivante :
 - `worker`: le back-end (lib pour casser des MD5, et bin pour l’exposer via un WebSocket, port 3000).
 - `spy`: le moniteur (auto-scaling, expose le nombre de serveurs via un WebSocket, port 4000)
 
-## Bogues
+## Notes
 
-Le navigateur Internet se connecte parfois à un worker qui travaille, la solution miracle
-est de faire <kbd>Ctrl</kbd> + <kbd>F5</kbd>.
+L'application peut mettre une ou deux minutes à charger au début.
 
 S’il y a écrit « Connexion… », c’est qu’il attend de faire l’handshaking avec le worker.
 
