@@ -28,6 +28,13 @@ S’il y a écrit « Connexion… », c’est qu’il attend de faire l’handsh
 S’il dit qu’il y a 0 workers actifs/disponibles, c’est qu’il n’est pas encore
 connecté/n’a pas encore reçu de message du spy.
 
+## Auto-scaling
+
+Le nombre de workers augmente si plus aucun worker n'est disponible.
+
+Le nombre de workers diminue si la plus de moitié est disponible,
+et qu'il y a 4+ workers disponibles.
+
 ## License
 
 Copyright (C) 2024, 2025 Lieselotte <52315535+she3py@users.noreply.github.com>
